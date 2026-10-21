@@ -5,16 +5,18 @@ from cv2 import aruco, imshow
 import math
 
 image = cv2.imread("aruco_images/room50.jpg")
-image = cv2.cvtColor(image,cv2.COLOR_BGR2BGRA)
 image2 = cv2.imread("aruco_images/poster.jpg")
+if image is None or image2 is None:
+    raise SystemExit("Input images not found: expected aruco_images/room50.jpg and aruco_images/poster.jpg")
+image = cv2.cvtColor(image,cv2.COLOR_BGR2BGRA)
 image2 = cv2.cvtColor(image2,cv2.COLOR_BGR2BGRA)
 
 def image_shower(image):
-cv2.namedWindow('window', cv2.WINDOW_KEEPRATIO)
-cv2.imshow('window', image)
-# cv2.imwrite('saved_images',image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    cv2.namedWindow('window', cv2.WINDOW_KEEPRATIO)
+    cv2.imshow('window', image)
+    # cv2.imwrite('saved_images',image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 height, width, chhanel = image2.shape
 print("Height:",height)
@@ -39,6 +41,8 @@ parameters = aruco.DetectorParameters()
 arucocorners, ids, Error = cv2.aruco.detectMarkers(image, aruco_dict, parameters=parameters)
 
 print('ArucoCorners: ',arucocorners)
+if ids is None or len(arucocorners) == 0:
+    raise SystemExit("No ArUco marker (DICT_7X7_250) detected in the room image")
 
 Arucoc1 = arucocorners[0][0][0]
 Arucoc2 = arucocorners[0][0][1]
@@ -80,4 +84,5 @@ image = cv2.bitwise_and(image, mask)
 image_shower(image)
 final_image = cv2.bitwise_or(image,transformed_image2)
 image_shower(final_image)
+os.makedirs("aug_images", exist_ok=True)
 cv2.imwrite("aug_images/new_img1.jpg",final_image)

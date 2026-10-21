@@ -1,51 +1,24 @@
-# Augmented-Reality
-# Multi_sensor_fusion
+# Augmented-Reality: ArUco poster overlay
 
----
+Detects an ArUco marker in a room photo and warps a poster image onto it with a perspective transform (OpenCV).
+Coursework project; a 10-page report is included (`Augumented_Reality.pdf`).
 
-## Algorithm Steps
-1. **Loading Images** – Read ArUco marker & poster image using `cv2.imread()`.
-2. **Detecting ArUco Markers** – Use `cv2.aruco` dictionary & `detectMarkers()` to get corner points.
-3. **Detecting Poster Corners** – Compute center points & scaled poster corners.
-4. **Perspective Transformation** – Align poster using `cv2.getPerspectiveTransform()` & `cv2.warpPerspective()`.
-5. **Masking** – Create mask with `np.zeros()` & `cv2.fillPoly()`.
-6. **Bitwise Operations** – Combine images with `cv2.bitwise_and()` & `cv2.bitwise_or()`.
-7. **Evaluation** – Compare perfectly aligned vs misaligned outputs.
+## Algorithm
+1. Load the room image and the poster image (`cv2.imread`).
+2. Detect the ArUco marker (`DICT_7X7_250`) and take its four corner points. Only the first detected marker is used.
+3. Compute the poster's central rectangle (width/6 x height/4) as the source quadrilateral.
+   This only avoids distortion if the poster has a 3:2 aspect ratio.
+4. Compute the homography (`cv2.getPerspectiveTransform`) and warp the poster (`cv2.warpPerspective`).
+5. Mask out the target region in the room image (`np.zeros_like`, `cv2.fillPoly`) and merge with `cv2.bitwise_and` / `cv2.bitwise_or`.
 
----
-
-##  Results
-
-###  Perfectly Aligned Images
-- Poster edges align accurately with wall edges.
-
-###  Misaligned Images
-- Caused by:
-  - Poor marker detection  
-  - Perspective distortion  
-  - Environmental lighting conditions
-
----
-
-##  Technologies & Libraries
-- **Python 3.x**
-- **OpenCV (cv2)**
-- **NumPy**
-
----
-
-
-##  How to Run
-
+## Run
 ```bash
-# Clone this repository
-git clone https://github.com/<your-username>/<repo-name>.git
-
-# Move into project folder
-cd <repo-name>
-
-# Install dependencies
-pip install opencv-python numpy
-
-# Run the script
+pip install opencv-python numpy   # the aruco API used needs a recent OpenCV (4.7 or newer)
 python augmented_reality.py
+```
+Expected inputs (not included in this repository): `aruco_images/room50.jpg` (room photo with an ArUco marker) and `aruco_images/poster.jpg`.
+The result is written to `aug_images/new_img1.jpg`.
+
+## Status and limitations
+- Demonstrated on a few classroom images; no quantitative evaluation. Alignment errors came from poor marker detection, perspective distortion and lighting (see report).
+- Sample input images are not included, so the script cannot run from a clean clone yet.
